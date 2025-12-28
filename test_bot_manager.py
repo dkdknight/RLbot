@@ -269,7 +269,9 @@ def run_all_tests():
         print(f"{status}: {test_name}")
     
     print("\n" + "=" * 60)
-    print(f"Results: {passed}/{total} tests passed ({100*passed//total}%)")
+    print("Results: {}/{} tests passed ({}%)".format(
+        passed, total, (100 * passed // total) if total > 0 else 0
+    ))
     print("=" * 60)
     
     return passed == total

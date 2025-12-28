@@ -33,6 +33,12 @@ class LSTMBot(nn.Module):
 
 
 class BotManager:
+    # Action space constants
+    ANALOG_ACTIONS_START = 0
+    ANALOG_ACTIONS_END = 5
+    BUTTON_ACTIONS_START = 5
+    BUTTON_ACTIONS_END = 8
+    
     def __init__(self, bot_path, host='localhost', port=5000):
         self.host = host
         self.port = port
@@ -161,10 +167,14 @@ class BotManager:
             actions = action_tensor.detach().cpu().numpy().flatten()
             
             # Clamp analog inputs to [-1, 1]
-            actions[0:5] = np.clip(actions[0:5], -1.0, 1.0)
+            actions[self.ANALOG_ACTIONS_START:self.ANALOG_ACTIONS_END] = np.clip(
+                actions[self.ANALOG_ACTIONS_START:self.ANALOG_ACTIONS_END], -1.0, 1.0
+            )
             
             # Convert buttons to binary
-            actions[5:8] = (actions[5:8] > 0.0).astype(np.float32)
+            actions[self.BUTTON_ACTIONS_START:self.BUTTON_ACTIONS_END] = (
+                actions[self.BUTTON_ACTIONS_START:self.BUTTON_ACTIONS_END] > 0.0
+            ).astype(np.float32)
             
             return actions
         
@@ -230,8 +240,12 @@ class BotManager:
                     
         except KeyboardInterrupt:
             print("\nStopping bot...")
+        except socket.error as e:
+            print(f"Socket error in main loop: {e}")
         except Exception as e:
             print(f"Error in main loop: {e}")
+            import traceback
+            traceback.print_exc()
         finally:
             self.disconnect()
     

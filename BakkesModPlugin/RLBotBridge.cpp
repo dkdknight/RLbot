@@ -191,8 +191,11 @@ void RLBotBridge::OnPhysicsTick(std::string eventName)
         // Apply actions to the car
         ApplyActions(actions);
         
+    } catch (const std::exception& e) {
+        cvarManager->log("Exception in physics tick: " + std::string(e.what()));
+        isConnected = false;
     } catch (...) {
-        cvarManager->log("Exception in physics tick");
+        cvarManager->log("Unknown exception in physics tick");
         isConnected = false;
     }
 }
